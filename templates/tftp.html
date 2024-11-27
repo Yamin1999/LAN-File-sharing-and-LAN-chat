@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panda TFTP Server</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/panda.png') }}" type="image/png">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}" />
+  <style>
+    /* Universal Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(
+          rgba(0, 0, 0, 0.4),
+          rgba(0, 0, 0, 0.4)
+        ),
+        url("https://www.bdcom.cn/uploadfile/2023/0727/20230727111051498.jpg")
+          no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      padding: 2rem;
+    }
+
+    /* Header and Logo */
+    .header {
+        padding-top: 50px;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header img {
+      height: 120px;
+      margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: #ff9a3e;
+    }
+
+    /* Main Content Wrapper */
+    .content-wrapper {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.15);
+      padding: 2rem;
+      border-radius: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      text-align: left;
+    }
+
+    .section-title {
+      color: #f3c623;
+      font-size: 1.75rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    /* Download Button */
+    .download-button {
+      display: inline-block;
+      background-color: #ff9a3e;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      margin: 1.5rem auto;
+      transition: background-color 0.3s ease;
+    }
+
+    .download-button:hover {
+      background-color: #e8862d;
+    }
+
+    /* Usage and Code Blocks */
+    .usage-example {
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      color: #ffebcd;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+
+    /* Links */
+    a {
+      color: #1abc9c;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* List Styles */
+    ul {
+      list-style-type: square;
+      margin: 1rem 0;
+      padding-left: 1.2rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-container">
+    <nav class="navbar">
+
+      <a href="/" class="nav-brand">
+        <img src="{{ url_for('static', filename='images/panda.png') }}" alt="PandaShare">
+        <span>PandaShare</span>
+      </a>
+
+      <a href="/" class="nav-link home-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Home
+      </a>
+      <a href="{{ url_for('readme') }}" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+        Readme
+      </a>
+      <a href="{{ url_for('tftp') }}" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+          <path d="M7 9l5-5 5 5"/>
+          <line x1="12" y1="4" x2="12" y2="16"/>
+        </svg>
+        TFTP Server
+      </a>
+      
+      <a href="{{ url_for('chat') }}" class="nav-link tftp-ad" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        PandaChat
+      </a>
+    </nav>
+  </div>
+
+  <div class="header">
+    <img src="{{ url_for('static', filename='images/panda.png') }}" alt="Panda Logo">
+    <h1>Panda TFTP Server</h1>
+    <p>Md. Yamin Haque, R&D Engineer at BDCOM</p>
+  </div>
+
+  <div class="content-wrapper">
+    <h2 class="section-title">Description</h2>
+    <p>Panda is a basic, independent TFTP server following the protocol defined by
+      <a href="https://datatracker.ietf.org/doc/html/rfc1350" target="_blank">RFC1350</a>. It also supports protocol extensions
+      defined by <a href="https://datatracker.ietf.org/doc/html/rfc2347" target="_blank">RFC2347</a>,
+      <a href="https://datatracker.ietf.org/doc/html/rfc2348" target="_blank">RFC2348</a>, and
+      <a href="https://datatracker.ietf.org/doc/html/rfc2349" target="_blank">RFC2349</a>.
+    </p>
+
+    <!-- Download Button -->
+    <div style="text-align: center;">
+      <a href="{{ url_for('static', filename='files/Panda.exe') }}" class="download-button">Download Panda TFTP Server</a>
+    </div>
+
+    <h2 class="section-title">Features</h2>
+    <ul>
+      <li>TFTP server for file transfer</li>
+      <li>Supports read and write operations</li>
+      <li>Concurrent read/write sessions</li>
+      <li>Option negotiation (block size, transfer size, timeout)</li>
+      <li>Timeout and retry mechanisms for reliable transfers</li>
+      <li>Progress bar for a single active session</li>
+    </ul>
+
+    <h2 class="section-title">Potential Upcoming Features</h2>
+    <ul>
+      <li>Progress tracking for multiple concurrent sessions</li>
+      <li>Configurability (settings, allowed clients)</li>
+      <li>Performance optimizations</li>
+      <li>Support for additional TFTP extensions</li>
+      <li>Graphical User Interface (GUI)</li>
+      <li>Integration with other systems/services</li>
+    </ul>
+	
+	<h2 class="section-title">Why Use Panda Instead of tftpd64?</h2>
+	<ul>
+		<li>Panda is lightweight.</li>
+		<li>Better Transfer speed.</li>
+		<li>No need for interface selection.</li>
+		<li>No need to show the file directory.</li>
+		<li>Just place Panda in the directory where you usually save your bin files.</li>
+		<li>If you flash your modified bin file, you can confirm it's the correct version by comparing its size with the previous bin file size in Panda's transfer history.</li>
+		<li>Transfer time logging helps match with switch's last given bin file time.</li>
+	</ul>
+	
+    <h2 class="section-title">Usages</h2>
+
+    <h3>Write Request</h3>
+    <div class="usage-example">
+      Session 0 : Request for write file : switch.bin from 192.168.0.103 <br>
+      Session 0 : Received 6887 blocks: 3525996 bytes <br>
+      Session 0 : Transfer complete 3525996 bytes to Panda at: Sat Aug 10 17:32:25 2024
+    </div>
+
+    <h3>Read Request</h3>
+    <div class="usage-example">
+      Session 0 : Request for read file : switch.bin from 192.168.0.103 <br>
+      Session 0 : Progress: [##################################################] 100.00% <br>
+      Session 0 : Transfer complete 3525996 bytes from Panda at: Sat Aug 10 17:39:08 2024
+    </div>
+
+
+        <h3>Retransmission and Timeout</h3>
+        <div class="usage-example">
+            Session 0 : Request for read file : switch.bin from 192.168.0.103 <br>
+            Session 0 : Progress: [################## ] 37.55% <br>
+            Session 0 : TFTP timeout!
+        </div>
+
+        <h3>Error Handling</h3>
+        <div class="usage-example">
+            <strong>Read request in netascii mode:</strong> <br>
+            Session 0 : Request for read file : switch.bin from 192.168.0.103 <br>
+            Session 0 : Only supports octet mode! <br><br>
+
+            <strong>Write request for a file that already exists:</strong> <br>
+            Session 0 : Request for write file : switch.bin from 192.168.0.103 <br>
+            Session 0 : File switch.bin already exists in the current directory. <br><br>
+
+            <strong>Read request for a nonexistent file:</strong> <br>
+            Session 0 : Request for read file : switch.tar from 192.168.0.103 <br>
+            Session 0 : File switch.tar does not exist in the current directory.
+        </div>
+    </div>
+</body>
+
+</html>

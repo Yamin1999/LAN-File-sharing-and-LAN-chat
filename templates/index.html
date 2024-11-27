@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PandaShare</title>
+
+  <link rel="icon" href="{{ url_for('static', filename='images/panda.png') }}" type="image/png" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/style.css') }}" />
+  <script src="{{ url_for('static', filename='scripts/script.js') }}" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+
+<body>
+
+  <div class="nav-container">
+    <nav class="navbar">
+
+      <a href="/" class="nav-brand">
+        <img src="{{ url_for('static', filename='images/panda.png') }}" alt="PandaShare">
+        <span>PandaShare</span>
+      </a>
+
+      <a href="/" class="nav-link home-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        Home
+      </a>
+      <a href="{{ url_for('readme') }}" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+        </svg>
+        Readme
+      </a>
+      <a href="{{ url_for('tftp') }}" class="nav-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+          <path d="M7 9l5-5 5 5"/>
+          <line x1="12" y1="4" x2="12" y2="16"/>
+        </svg>
+        TFTP Server
+      </a>
+      
+      <a href="{{ url_for('chat') }}" class="nav-link tftp-ad" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        PandaChat
+      </a>
+    </nav>
+  </div>
+
+
+
+  <div class="notice-bar">
+    <div class="notice-content">
+      <div class="notice-text">
+        <span class="notice-title">বিজ্ঞপ্তি:</span>
+        <div class="marquee-wrapper">
+          <div class="marquee">
+            <span class="marquee-content">
+             <b> New update: </b> PandaChat has been implemented to facilitate communication within the LAN. Also a chatbox popup has been integrated into PandaShare.
+            </span>
+
+            <span class="marquee-content">
+              নতুন উপডেটঃ এখন আপলোডকারীর নাম আপলোডেড ফাইলের সাথে দেখা যাবে। কোনো লুকচুরি চলবে নাহ।
+            </span>
+            <span class="marquee-content">
+              <b> New update: </b> PandaChat has been implemented to facilitate communication within the LAN. Also a chatbox popup has been integrated into PandaShare.
+            </span>
+
+            <span class="marquee-content">
+              নতুন উপডেটঃ এখন আপলোডকারীর নাম আপলোডেড ফাইলের সাথে দেখা যাবে। কোনো লুকচুরি চলবে নাহ।
+            </span>
+
+            <span class="marquee-content">
+              <b> New update: </b> PandaChat has been implemented to facilitate communication within the LAN. Also a chatbox popup has been integrated into PandaShare.
+            </span>
+
+            <span class="marquee-content">
+              নতুন উপডেটঃ এখন আপলোডকারীর নাম আপলোডেড ফাইলের সাথে দেখা যাবে। কোনো লুকচুরি চলবে নাহ।
+            </span>
+          </div>
+        </div>
+      </div>
+      <button class="learn-more" onclick="openPopup()">আরও জানুন</button>
+    </div>
+  </div>
+
+
+  <div class="popup-overlay" id="noticePopup" onclick="closePopupOnOverlay(event)">
+    <div class="popup-content">
+      <div class="popup-header">
+        <div class="popup-title">সকল বিজ্ঞপ্তি</div>
+        <button class="close-button" onclick="closePopup()">&times;</button>
+      </div>
+      <ul class="notice-list">
+
+
+        <li class="notice-item">
+          <div class="notice-date">২৫ নভেম্বর, ২০২৪</div>
+          <div class="notice-message">
+            <b> New update: </b> PandaChat has been implemented to facilitate communication within the LAN. Also a chatbox popup has been integrated into PandaShare.
+          </div>
+        </li>
+
+
+        <li class="notice-item">
+          <div class="notice-date">২০ নভেম্বর, ২০২৪</div>
+          <div class="notice-message">
+            নতুন উপডেটঃ এখন আপলোডকারীর নাম আপলোডেড ফাইলের সাথে দেখা যাবে। কোনো লুকচুরি চলবে নাহ।
+          </div>
+        </li>
+
+        
+
+        <!--
+      <li class="notice-item">
+        <div class="notice-date">১৫ নভেম্বর, ২০২৪</div>
+        <div class="notice-message">
+          বড় ভাইয়ের ইউটিউব চ্যানেলঃ <a href="https://www.youtube.com/@shohan_07">লিংক</a>। লাইক কমেন্ট করে পাশে থাকবেন।  
+        </div>
+      </li>
+
+      -->
+
+
+      </ul>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
+    <h1>Upload a File</h1>
+
+    <div id="upload-container" class="upload-container">
+      <div class="upload-icon">📤</div>
+      Drag & Drop files here or click to upload
+      <br />
+      <small>Maximum file size: 1GB</small>
+    </div>
+
+    <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+      <input id="fileInput" type="file" name="file" style="display: none" onchange="handleFileSelect(this)" />
+    </form>
+
+    <h2>Available Files</h2>
+    <ul class="file-list">
+      {% for file in files %}
+      <li>
+        <div class="file-info">
+          <div class="file-details">
+            <a href="{{ url_for('download_file', filename=file.name) }}" class="file-name" title="{{ file.name }}">
+              {{ file.name }}
+            </a>
+            <span class="file-size">{{ file.size }}</span>
+          </div>
+          <span class="uploader">Uploaded by: {{ file.ip }}</span>
+        </div>
+        <div class="delete-icon" onclick="confirmDelete('{{ file.name }}')" title="Delete file">
+          <svg viewBox="0 0 24 24">
+            <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
+          </svg>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <form id="clearAllForm" action="/clear" method="post" style="display: none"></form>
+
+    <button onclick="confirmClearAll()" class="clear-button">
+      Clear All Files
+    </button>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <h3>Confirm Deletion</h3>
+      <p>Are you sure you want to delete this file?</p>
+      <div class="modal-buttons">
+        <button class="modal-button confirm-delete" onclick="deleteFile()">
+          Delete
+        </button>
+        <button class="modal-button cancel-delete" onclick="closeModal_delete()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Clear all confirmation modal -->
+  <div id="clearAllModal" class="modal">
+    <div class="modal-content">
+      <h3>Warning!</h3>
+      <p>
+        Are you sure you want to delete all files? This action cannot be
+        undone.
+      </p>
+      <div class="modal-buttons">
+        <button class="modal-button confirm-delete" onclick="clearAllFiles()">
+          Delete All
+        </button>
+        <button class="modal-button cancel-delete" onclick="closeClearAllModal()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+  
+
+  <div class="chat-button" onclick="toggleChat()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+  </div>
+
+  <div class="chat-popup" id="chatPopup">
+    <div class="chat-container">
+      <div class="message-list" id="messageList"></div>
+      <form class="message-form" id="messageForm">
+        <div class="preview-container" id="previewContainer">
+          <div class="image-preview" id="imagePreview">
+            <img src="" alt="Preview">
+            <div class="remove-preview" onclick="removePreview()">×</div>
+          </div>
+        </div>
+        <label class="image-upload">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+          <input type="file" id="imageInput" accept="image/*">
+        </label>
+        <input type="text" class="message-input" id="messageInput" placeholder="Type your message...">
+        <button type="submit" class="send-button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13" />
+            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="imageModal">
+    <span class="modal-close" onclick="closeModal()">×</span>
+    <img id="modalImage" src="" alt="Preview">
+  </div>
+</body>
+
+</html>

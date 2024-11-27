@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PandaChat</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/wechat(1).png') }}" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .chat-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 100%;
+            overflow: hidden;
+        }
+
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: #4CAF50;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+
+        .chat-header i {
+            font-size: 24px;
+        }
+
+        .message-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            min-height: 100px;
+            margin-bottom: 0;
+        }
+
+
+        .message {
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 12px 16px;
+            border-radius: 20px;
+            /* Rounded chat bubbles */
+            word-wrap: break-word;
+            position: relative;
+        }
+
+
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            /* Important for Firefox */
+            flex: 1;
+        }
+
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #4CAF50;
+            /* Subtle green for usernames */
+            font-weight: 600;
+            /* Bold username */
+        }
+
+        .message-header span {
+            font-size: 0.85em;
+            color: #888;
+            /* Subtle gray for timestamps */
+            font-weight: normal;
+        }
+
+        .message-content {
+            word-break: break-word;
+            white-space: pre-wrap;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.5;
+        }
+
+
+        .message-image img {
+            max-width: 200px;
+            /* Reduced from 300px */
+            max-height: 200px;
+            /* Reduced from 300px */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            object-fit: cover;
+            /* Ensures image covers the area properly */
+        }
+
+        .message-image img:hover {
+            transform: scale(1.02);
+        }
+
+        .message-form {
+            display: flex;
+            padding: 20px;
+            gap: 12px;
+            background: white;
+            border-top: 1px solid #eef2f7;
+            align-items: center;
+            /* Changed from flex-end to center */
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .message-input-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            /* Added */
+            align-items: center;
+            /* Added */
+        }
+
+        .message-input {
+            width: 100%;
+            min-height: 45px;
+            max-height: 150px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 15px;
+            transition: all 0.3s;
+            outline: none;
+            resize: none;
+            overflow-y: auto;
+            line-height: 1.5;
+            font-family: inherit;
+            align-self: center;
+            /* Added */
+        }
+
+        .message-input {
+            scrollbar-width: none;
+            scrollbar-color: #888 #f1f1f1;
+            overflow-y: auto;
+        }
+
+        .message-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+
+        .message-input::-webkit-scrollbar {
+            width: 0px;
+        }
+
+
+        .image-upload,
+        .send-button {
+            flex-shrink: 0;
+            height: 45px;
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        .image-upload {
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .image-upload:hover {
+            background: #e9ecef;
+            transform: scale(1.05);
+        }
+
+        .image-upload input {
+            display: none;
+        }
+
+        .send-button {
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        .image-preview {
+            width: 100px;
+            /* Set fixed width */
+            height: 100px;
+            /* Set fixed height */
+            margin: 10px 0;
+            display: none;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Makes the image cover the container properly */
+            display: block;
+            /* Removes any extra space below the image */
+        }
+
+        .preview-container {
+            position: relative;
+        }
+
+        .remove-preview {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+
+        .remove-preview:hover {
+            transform: scale(1.1);
+            background: #ff3333;
+        }
+
+        .user-list {
+            width: 250px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+
+        }
+
+        .user-list h3 {
+            margin: 0 0 20px 0;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eef2f7;
+            color: #2c3e50;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-item {
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            color: #2c3e50;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .user-item i {
+            color: #4CAF50;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.1);
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+            /* Width of the scrollbar */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            /* Light background of the scrollbar track */
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            /* Color of the scrollbar handle */
+            border-radius: 4px;
+            /* Rounded corners for the handle */
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+            /* Darker color when hovering over the scrollbar */
+        }
+
+        .message-list {
+            overflow-y: auto;
+            /* Ensure scrolling is enabled */
+            scrollbar-width: thin;
+            /* For Firefox */
+            scrollbar-color: #888 #f1f1f1;
+            /* For Firefox */
+        }
+
+        .message-content a {
+            color: #3155e2;
+            text-decoration: none;
+            word-break: break-all;
+            transition: color 0.2s;
+        }
+
+        .message-content a:hover {
+            color: #3155e2;
+            text-decoration: underline;
+        }
+
+
+        @media (max-width: 768px) {
+            .chat-container {
+                flex-direction: column;
+                margin: 10px;
+                height: calc(100vh - 20px);
+            }
+
+            .user-list {
+                width: 100%;
+                max-height: 200px;
+            }
+
+            .message {
+                max-width: 100%;
+                /* Allow full width on mobile */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-main">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i>
+                <h2>PandaChat</h2>
+            </div>
+            <div class="message-list" id="messageList"></div>
+            <form class="message-form" id="messageForm">
+                <div class="preview-container">
+                    <div class="image-preview" id="imagePreview">
+                        <img src="" alt="Preview">
+                        <div class="remove-preview" onclick="removePreview()">×</div>
+                    </div>
+                </div>
+                <label class="image-upload">
+                    <i class="fas fa-image"></i>
+                    <input type="file" id="imageInput" accept="image/*">
+                </label>
+                <div class="message-input-container">
+                    <textarea class="message-input" id="messageInput" placeholder="Type your message..."
+                        rows="1"></textarea>
+                </div>
+                <button type="submit" class="send-button">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+        <div class="user-list" id="userList">
+            <h3><i class="fas fa-users"></i> Active Users</h3>
+        </div>
+    </div>
+
+    <div class="modal" id="imageModal">
+        <span class="modal-close" onclick="closeModal()">×</span>
+        <img id="modalImage" src="" alt="Preview">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const textarea = document.getElementById('messageInput');
+        const messageList = document.getElementById('messageList');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+
+        let selectedFile = null;
+
+
+        function scrollToBottom(smooth = true) {
+            setTimeout(() => {
+                messageList.scrollTo({
+                    top: messageList.scrollHeight,
+                    behavior: smooth ? 'smooth' : 'auto'
+                });
+            }, 0);
+        }
+        function createScrollDownButton() {
+            const scrollDownButton = document.createElement('button');
+            scrollDownButton.innerHTML = '<i class="fas fa-arrow-down"></i>';
+            scrollDownButton.className = 'scroll-down-button';
+            scrollDownButton.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        right: calc(50% - 600px + 280px);
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        cursor: pointer;
+        z-index: 20;
+        transition: all 0.3s;
+    `;
+
+            scrollDownButton.addEventListener('click', () => {
+                scrollToBottom();
+                scrollDownButton.style.display = 'none';
+            });
+
+            document.body.appendChild(scrollDownButton);
+            return scrollDownButton;
+        }
+
+        const scrollDownButton = createScrollDownButton();
+
+
+        messageList.addEventListener('scroll', () => {
+            // Check if user has scrolled up from the bottom
+            const isAtBottom = messageList.scrollHeight - messageList.scrollTop - messageList.clientHeight < 50;
+
+            if (!isAtBottom) {
+                scrollDownButton.style.display = 'flex';
+            } else {
+                scrollDownButton.style.display = 'none';
+            }
+        });
+
+        // Adjust button position on window resize
+        window.addEventListener('resize', () => {
+            scrollDownButton.style.right = window.innerWidth > 1400
+                ? `calc(50% - 500px + 280px)`
+                : '20px';
+        });
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const utcOffset = 6; // UTC+6
+            const localTime = new Date(date.getTime() + utcOffset * 60 * 60 * 1000);
+            return localTime.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+
+        function adjustTextareaHeight() {
+            textarea.style.height = 'auto';
+            const newHeight = Math.min(textarea.scrollHeight, 150);
+            textarea.style.height = newHeight + 'px';
+            scrollToBottom();
+        }
+
+        textarea.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const items = e.clipboardData.items;
+            const pastedText = e.clipboardData.getData('text');
+
+            // Check for image file in clipboard
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    const file = items[i].getAsFile();
+                    selectedFile = file;
+                    showPreview(file);
+                    return;
+                }
+            }
+
+            // Check for image URL or data URI
+            if (pastedText.match(/^(https?:\/\/.*\.(png|jpg|jpeg|gif|webp))|^data:image\//i)) {
+                e.preventDefault();
+
+                // Fetch image as blob for file upload
+                if (pastedText.startsWith('http')) {
+                    fetch(pastedText)
+                        .then(response => response.blob())
+                        .then(blob => {
+                            selectedFile = new File([blob], 'pasted-image', { type: blob.type });
+                            showPreview(selectedFile);
+                        })
+                        .catch(error => console.error('Image fetch error:', error));
+                }
+                // Handle data URI directly
+                else {
+                    // Convert data URI to File
+                    const byteCharacters = atob(pastedText.split(',')[1]);
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const byteArray = new Uint8Array(byteNumbers);
+                    const blob = new Blob([byteArray], { type: 'image/png' });
+                    selectedFile = new File([blob], 'pasted-image', { type: blob.type });
+                    showPreview(selectedFile);
+                }
+                return;
+            }
+
+            // Fallback to text paste handling
+            const startPos = textarea.selectionStart;
+            const endPos = textarea.selectionEnd;
+            const textBeforeCursor = textarea.value.substring(0, startPos);
+            const textAfterCursor = textarea.value.substring(endPos);
+            textarea.value = textBeforeCursor + pastedText + textAfterCursor;
+            const newCursorPos = startPos + pastedText.length;
+            textarea.setSelectionRange(newCursorPos, newCursorPos);
+            adjustTextareaHeight();
+        });
+
+        // Handle input changes including new lines
+        textarea.addEventListener('input', adjustTextareaHeight);
+
+        // Handle keydown for Shift+Enter with improved handling
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                messageForm.dispatchEvent(new Event('submit'));
+            } else if (e.key === 'Enter' && e.shiftKey) {
+                setTimeout(adjustTextareaHeight, 0);
+            }
+        });
+
+        function createMessageElement(data) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            header.innerHTML = `
+        <strong>${data.sender}</strong>
+        <span class="message-time">${formatTime(data.timestamp)}</span>
+    `;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            if (data.message_type === 'image') {
+                contentDiv.innerHTML = data.message;
+                const imgElement = contentDiv.querySelector('img');
+                if (imgElement) {
+                    imgElement.onclick = () => showImage(imgElement.src);
+                    imgElement.onload = () => scrollToBottom();
+                }
+            } else {
+                // URL regex pattern
+                const urlPattern = /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g;
+
+                // Convert URLs to clickable links and preserve line breaks
+                const messageWithLinks = data.message
+                    .replace(/\n/g, '<br>')  // Convert line breaks to <br> tags
+                    .replace(urlPattern, function (url) {
+                        const displayText = url.length > 30
+                            ? url.slice(0, 15) + '...' + url.slice(-15)
+                            : url;
+                        return `${url}`;
+                    });
+
+                contentDiv.innerHTML = messageWithLinks;
+            }
+
+            messageDiv.appendChild(header);
+            messageDiv.appendChild(contentDiv);
+            return messageDiv;
+        }
+
+        function showPreview(file) {
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.querySelector('img').src = e.target.result;
+                    imagePreview.style.display = 'block';
+                    scrollToBottom();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePreview() {
+            imagePreview.style.display = 'none';
+            imagePreview.querySelector('img').src = '';
+            imageInput.value = '';
+            selectedFile = null;
+        }
+
+        function showImage(src) {
+            modalImage.src = src;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+        }
+
+        let unreadMessageCount = 0;
+
+        function updatePageTitle() {
+            const baseTitle = 'PandaChat';
+            if (unreadMessageCount > 0) {
+                document.title = `(${unreadMessageCount}) ${baseTitle}`;
+            } else {
+                document.title = baseTitle;
+            }
+        }
+        updatePageTitle();
+        // Event Listeners
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                selectedFile = file;
+                showPreview(file);
+            }
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Initialize
+        adjustTextareaHeight();
+        scrollToBottom(false);
+
+        socket.on('connect', () => {
+            console.log('Connected to chat');
+        });
+
+        socket.on('chat_history', (messages) => {
+            messageList.innerHTML = '';
+            messages.forEach(msg => {
+                const messageElement = createMessageElement(msg);
+                messageList.appendChild(messageElement);
+            });
+            scrollToBottom(false);
+        });
+
+
+
+        socket.on('new_message', (data) => {
+            const messageElement = createMessageElement(data);
+            messageList.appendChild(messageElement);
+            scrollToBottom();
+
+            // Only increment unread count if the chat window is not in focus
+            if (!document.hasFocus()) {
+                unreadMessageCount++;
+                updatePageTitle();
+            }
+        })
+
+        window.addEventListener('focus', () => {
+            unreadMessageCount = 0;
+            updatePageTitle();
+        });
+
+        // Optionally, reset unread count when switching to the chat tab
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                unreadMessageCount = 0;
+                updatePageTitle();
+            }
+        });
+
+
+
+        socket.on('user_list', (users) => {
+            const userListDiv = document.getElementById('userList');
+            userListDiv.innerHTML = '<h3>Active Users</h3>';
+            users.forEach(username => {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'user-item';
+                userDiv.textContent = username;
+                userListDiv.appendChild(userDiv);
+            });
+        });
+
+        messageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+
+            if (selectedFile) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const imageData = new Uint8Array(e.target.result);
+                    socket.emit('image_upload', {
+                        filename: selectedFile.name,
+                        image: imageData,
+                        message: message
+                    });
+                    removePreview();
+                    messageInput.value = '';
+                    adjustTextareaHeight();
+                };
+                reader.readAsArrayBuffer(selectedFile);
+            } else if (message) {
+                socket.emit('chat_message', { message });
+                messageInput.value = '';
+                adjustTextareaHeight();
+            }
+        });
+
+    </script>
+</body>
+
+</html>
